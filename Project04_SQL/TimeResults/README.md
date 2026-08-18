@@ -89,13 +89,13 @@ Tạo bảng trong report gồm:
 
 | Query | Before (ms) | After (ms) | Improvement | Main change |
 |---|---:|---:|---:|---|
-| Revenue/month |5.329s | | | Parallel aggregate / partition scan |
-| Seller + date | | | | Partition pruning + seller index |
-| Product filter | | | | Seq Scan → Bitmap/Index Scan |
-| Highest order | | | | Sort → index scan on total_amount |
-| Top quantity | | | | Aggregate behavior |
+| Revenue/month |5.329 |4.962 | | Parallel aggregate / partition scan |
+| Seller + date |2228.282 |747.217 | | Partition pruning+seller index |
+| Product filter |589.751 |130.035 | | Seq Scan → Bitmap/Index Scan |
+| Highest order |1042.913 |30.652 | | Sort → index scan on total_amount |
+| Top quantity |2125.082 |2281.171 | | Aggregate behavior |
 | Seller March | | | | March partitions only |
-| Product/month | | | | Partitioned aggregate |
+| Product/month |4122.007 |3749.715 | | Partitioned aggregate |
 | Products/seller | | | | product seller index |
 
 Công thức:
