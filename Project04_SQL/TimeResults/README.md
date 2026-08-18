@@ -89,17 +89,52 @@ Tạo bảng trong report gồm:
 
 | Query | Before (ms) | After (ms) | Improvement | Main change |
 |---|---:|---:|---:|---|
-| Revenue/month |5.329 |4.962 | | Parallel aggregate / partition scan |
+| Revenue/month |4263.903 |4049.267 | | Parallel aggregate / partition scan |
 | Seller + date |2228.282 |747.217 | | Partition pruning+seller index |
 | Product filter |589.751 |130.035 | | Seq Scan → Bitmap/Index Scan |
 | Highest order |1042.913 |30.652 | | Sort → index scan on total_amount |
 | Top quantity |2125.082 |2281.171 | | Aggregate behavior |
-| Seller March | | | | March partitions only |
+| Seller March |1531458.066 |1575191.483 | | March partitions only |
 | Product/month |4122.007 |3749.715 | | Partitioned aggregate |
-| Products/seller | | | | product seller index |
+| Products/seller |29073.395 |261618.277 | | product seller index |
 
 Công thức:
 
 ```text
 Improvement (%) = (Before - After) / Before × 100
 ```
+Giải thích tại sao ở case 8 time before lại nhanh hơn rất nhiều so với time after:
+Lý do chính là query của:
+`FROM order_item oi
+JOIN product p ON p.product_id = oi.product_id
+GROUP BY p.seller_id`
+
+không hề có điều kiện WHERE order_date .... Trong khi partition order_item theo order_date.
+
+Vì thế PostgreSQL không loại được partition nào. 
+
+- Before nó chỉ cần:
+Seq Scan order_item
+→ đọc 17.5M rows
+→ Hash Join product
+→ Sort/Aggregate
+
+- Nhưng After có thể thành:
+Append
+├── Scan order_item_2025_01
+├── Scan order_item_2025_02
+├── Scan order_item_2025_03
+├── Scan order_item_2025_04
+└── Scan order_item_2025_05
+→ Join
+→ Sort/Aggregate
+
+Tức là vẫn phải đọc đủ 17.5 triệu dòng, nhưng còn thêm overhead quản lý 5 partition.
+
+Ngoài ra, index product_id cũng không nhất thiết giúp query này. Vì không lọc một product_id cụ thể; query cần tất cả product để tính:
+`count(DISTINCT oi.product_id)
+sum(oi.quantity)
+sum(oi.subtotal)`
+Nên quét tuần tự toàn bảng thường còn hợp lý hơn dùng index.
+
+Có thể xử lí như sau: Thay vì join 17.5 triệu dòng với product rồi mới aggregate, aggregate theo product trước
