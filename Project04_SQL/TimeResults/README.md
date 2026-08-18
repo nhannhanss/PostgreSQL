@@ -89,7 +89,7 @@ Tạo bảng trong report gồm:
 
 | Query | Before (ms) | After (ms) | Improvement | Main change |
 |---|---:|---:|---:|---|
-| Revenue/month | | | | Parallel aggregate / partition scan |
+| Revenue/month |5.329s | | | Parallel aggregate / partition scan |
 | Seller + date | | | | Partition pruning + seller index |
 | Product filter | | | | Seq Scan → Bitmap/Index Scan |
 | Highest order | | | | Sort → index scan on total_amount |
