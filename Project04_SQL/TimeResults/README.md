@@ -89,14 +89,14 @@ Tạo bảng trong report gồm:
 
 | Query | Before (ms) | After (ms) | Improvement | Main change |
 |---|---:|---:|---:|---|
-| Revenue/month |4263.903 |4049.267 | | Parallel aggregate / partition scan |
-| Seller + date |2228.282 |747.217 | | Partition pruning+seller index |
-| Product filter |589.751 |130.035 | | Seq Scan → Bitmap/Index Scan |
-| Highest order |1042.913 |30.652 | | Sort → index scan on total_amount |
-| Top quantity |2125.082 |2281.171 | | Aggregate behavior |
-| Seller March |1531458.066 |1575191.483 | | March partitions only |
-| Product/month |4122.007 |3749.715 | | Partitioned aggregate |
-| Products/seller |29073.395 |261618.277 | | product seller index |
+| Revenue/month |4263.903 |4049.267 |+5.03% | Parallel aggregate / partition scan |
+| Seller + date |2228.282 |747.217 |+66.47% | Partition pruning+seller index |
+| Product filter |589.751 |130.035 |+77.95% | Seq Scan → Bitmap/Index Scan |
+| Highest order |1042.913 |30.652 |+97.06% | Sort → index scan on total_amount |
+| Top quantity |2125.082 |2281.171 |-7.35% | Aggregate behavior |
+| Seller March |1531458.066 |1575191.483 |-2.86% | March partitions only |
+| Product/month |4122.007 |3749.715 |+9.03% | Partitioned aggregate |
+| Products/seller |29073.395 |261618.277 |-799.85% | product seller index |
 
 Công thức:
 
