@@ -71,18 +71,6 @@ FOREIGN KEY (order_id, order_date)
 REFERENCES "order"(order_id, order_date)
 ```
 
-Đây là điều chỉnh cần thiết để partition đúng trong PostgreSQL.
-
-## Nội dung cần chụp để nộp
-
-Với mỗi truy vấn trong file 03 và 05, chụp:
-
-- Query result.
-- `Execution Time`.
-- `Planning Time`.
-- Node chính trong plan: `Seq Scan`, `Index Scan`, `Bitmap Index Scan`, `Hash Join`, `Parallel Seq Scan`, `Append`/`Parallel Append`.
-- Sau partition, chỉ ra partition pruning ở truy vấn có điều kiện tháng 3/2025.
-
 ## So sánh trước và sau
 
 Tạo bảng trong report gồm:
